@@ -1,14 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { ShieldCheck } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import api from "@/lib/axios";
 
 export default function AdminLoginPage() {
-  const router = useRouter();
   const [form, setForm] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
 
@@ -19,8 +17,7 @@ export default function AdminLoginPage() {
     try {
       await api.post("super-admin/login", form, { withCredentials: true });
       toast.success("Welcome to Admin Console");
-      router.push("/admin/dashboard");
-      router.refresh();
+      window.location.assign("/admin/dashboard");
     } catch (error) {
       toast.error(error?.response?.data?.message || "Admin login failed");
     } finally {

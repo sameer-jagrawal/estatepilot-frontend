@@ -1,13 +1,10 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { Bell, LogOut, Menu, Search } from "lucide-react";
 import { toast } from "sonner";
 import api from "@/lib/axios";
 
 export default function AdminTopbar({ onMenu }) {
-  const router = useRouter();
-
   const handleLogout = async () => {
     try {
       await api.post("super-admin/logout", {}, { withCredentials: true });
@@ -15,8 +12,7 @@ export default function AdminTopbar({ onMenu }) {
     } catch (error) {
       toast.error(error?.response?.data?.message || "Logout failed");
     } finally {
-      router.push("/admin/login");
-      router.refresh();
+      window.location.assign("/admin/login");
     }
   };
 

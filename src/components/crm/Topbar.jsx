@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { AlertTriangle, Bell, ChevronDown, Loader2, LogOut, Menu, Search, X } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { toast } from "sonner";
@@ -19,7 +18,6 @@ function formatRole(value) {
 }
 
 export default function Topbar({ onMenu }) {
-  const router = useRouter();
   const { user: fallbackUser } = useAuth();
   const [currentUser, setCurrentUser] = useState(fallbackUser);
   const [open, setOpen] = useState(false);
@@ -56,8 +54,7 @@ export default function Topbar({ onMenu }) {
       const response = await api.post("auth/logout");
       toast.success(response?.data?.message || "Logout successful");
       setLogoutConfirmOpen(false);
-      router.replace("/login");
-      router.refresh();
+      window.location.assign("/");
     } catch (error) {
       toast.error(error?.response?.data?.message || "Unable to logout");
     } finally {

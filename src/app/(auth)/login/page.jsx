@@ -16,9 +16,7 @@ function LoginForm() {
 
   const handleLogin = async (formData) => {
     try {
-      const response = await api.post("auth/login", formData, {
-        baseURL: "/api/",
-      });
+      const response = await api.post("auth/login", formData);
 
       toast.success(response?.data?.message || "Login successful");
       if (response?.data?.success) {
