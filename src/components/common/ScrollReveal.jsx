@@ -1,8 +1,6 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { gsap } from "gsap";
-import { useInView } from "react-intersection-observer";
 
 export default function ScrollReveal({
   children,
@@ -16,45 +14,67 @@ export default function ScrollReveal({
   once = true,
 }) {
   const elementRef = useRef(null);
-  const { ref, inView } = useInView({
-    threshold: 0.18,
-    triggerOnce: once,
-  });
-
-  const setRefs = (node) => {
-    elementRef.current = node;
-    ref(node);
-  };
 
   useEffect(() => {
-    if (!elementRef.current || !inView) return;
+    const node = elementRef.current;
+    if (!node) return undefined;
 
+    let context;
+    let cancelled = false;
     const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    if (prefersReducedMotion) {
-      gsap.set(elementRef.current, { autoAlpha: 1, x: 0, y: 0, scale: 1, rotate: 0, filter: "blur(0px)" });
-      return;
-    }
+    const reveal = async () => {
+      if (cancelled) return;
 
-    gsap.fromTo(
-      elementRef.current,
-      { autoAlpha: 0, x, y, scale, rotate, filter: `blur(${blur}px)` },
-      {
-        autoAlpha: 1,
-        x: 0,
-        y: 0,
-        scale: 1,
-        rotate: 0,
-        filter: "blur(0px)",
-        delay,
-        duration: 1,
-        ease: "back.out(1.35)",
+      if (prefersReducedMotion) {
+        node.style.opacity = "1";
+        node.style.transform = "none";
+        node.style.filter = "blur(0px)";
+        return;
       }
+
+      const { gsap } = await import("gsap");
+      if (cancelled) return;
+
+      context = gsap.context(() => {
+        gsap.fromTo(
+          node,
+          { autoAlpha: 0, x, y, scale, rotate, filter: `blur(${blur}px)` },
+          {
+            autoAlpha: 1,
+            x: 0,
+            y: 0,
+            scale: 1,
+            rotate: 0,
+            filter: "blur(0px)",
+            delay,
+            duration: 1,
+            ease: "back.out(1.35)",
+          }
+        );
+      }, node);
+    };
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        reveal();
+        if (once) observer.disconnect();
+      },
+      { threshold: 0.18 }
     );
-  }, [blur, delay, inView, rotate, scale, x, y]);
+
+    observer.observe(node);
+
+    return () => {
+      cancelled = true;
+      observer.disconnect();
+      context?.revert();
+    };
+  }, [blur, delay, once, rotate, scale, x, y]);
 
   return (
-    <div ref={setRefs} className={className}>
+    <div ref={elementRef} className={className}>
       {children}
     </div>
   );

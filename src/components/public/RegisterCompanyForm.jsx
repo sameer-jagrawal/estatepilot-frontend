@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
 import { toast } from "sonner";
 import Button from "@/components/common/Button";
 import Input from "@/components/common/Input";
@@ -66,11 +65,8 @@ export default function RegisterCompanyForm({ compact = false }) {
   };
 
   return (
-    <motion.section
-      initial={{ opacity: 0, y: 28, scale: 0.94, rotate: 1 }}
-      animate={{ opacity: 1, y: 0, scale: 1, rotate: 0 }}
-      transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-      className={`register-company-card w-full ${compact ? "max-w-[430px] p-4 sm:p-5" : "max-w-xl p-6 sm:p-8"}`}
+    <section
+      className={`register-company-card reveal-panel w-full ${compact ? "max-w-[420px] p-4 sm:p-5" : "max-w-[520px] p-6 sm:p-8"}`}
     >
       <div className={compact ? "mb-5" : "mb-8"}>
         {!compact ? (
@@ -113,6 +109,6 @@ export default function RegisterCompanyForm({ compact = false }) {
           Login
         </Link>
       </p>
-    </motion.section>
+    </section>
   );
 }

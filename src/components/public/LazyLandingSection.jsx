@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import { useInView } from "react-intersection-observer";
+import { useEffect, useRef, useState } from "react";
 
 export default function LazyLandingSection({
   children,
@@ -9,18 +8,31 @@ export default function LazyLandingSection({
   placeholderClassName = "min-h-screen",
   name,
 }) {
+  const sectionRef = useRef(null);
   const [shouldRender, setShouldRender] = useState(false);
-  const { ref } = useInView({
-    rootMargin: "140px 0px",
-    threshold: 0.04,
-    triggerOnce: true,
-    onChange: (visible) => {
-      if (visible) setShouldRender(true);
-    },
-  });
+
+  useEffect(() => {
+    const node = sectionRef.current;
+    if (!node || shouldRender) return undefined;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        setShouldRender(true);
+        observer.disconnect();
+      },
+      {
+        rootMargin: "140px 0px",
+        threshold: 0.04,
+      }
+    );
+
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [shouldRender]);
 
   return (
-    <section ref={ref} data-landing-section={name} className={className}>
+    <section ref={sectionRef} data-landing-section={name} className={className}>
       {shouldRender ? children : <div aria-hidden="true" className={placeholderClassName} />}
     </section>
   );

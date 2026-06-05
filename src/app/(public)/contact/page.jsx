@@ -10,7 +10,7 @@ export default function ContactPage() {
           <h1 className="mt-3 text-4xl font-medium">Talk to EstatePilot</h1>
           <p className="mt-4 text-[#64748B]">Share your team size and workflow. We will help you map the right launch setup.</p>
         </div>
-        <form className="saas-card grid gap-4 p-6">
+        <form className="saas-card grid w-full max-w-[520px] gap-4 justify-self-end p-6">
           <Input id="name" label="Name" placeholder="Your name" />
           <Input id="email" label="Email" type="email" placeholder="you@company.com" />
           <label htmlFor="message" className="block">

@@ -1,12 +1,23 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import api from "@/lib/axios";
-import AdminCharts from "@/components/admin/dashboard/AdminCharts";
 import AdminDashboardOverview from "@/components/admin/dashboard/AdminDashboardOverview";
 import AdminRecentTenants from "@/components/admin/dashboard/AdminRecentTenants";
+
+const AdminCharts = dynamic(() => import("@/components/admin/dashboard/AdminCharts"), {
+  ssr: false,
+  loading: () => (
+    <div className="grid gap-4 xl:grid-cols-3">
+      {[1, 2, 3].map((item) => (
+        <div key={item} className="h-72 animate-pulse border border-[#DDE5EF] bg-white" />
+      ))}
+    </div>
+  ),
+});
 
 export default function AdminDashboardPage() {
   const router = useRouter();

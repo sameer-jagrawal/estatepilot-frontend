@@ -15,14 +15,21 @@ export default function AuthForm({
   footerHref,
   footerLabel,
   onSubmit,
+  size = "sm",
 }) {
+  const normalizedFields = fields.map((field) => ({
+    ...field,
+    name: field.name || field.id,
+  }));
+
   const initialState = fields.reduce((acc, field) => {
-    acc[field.name] = field.defaultValue || "";
+    acc[field.name || field.id] = field.defaultValue || "";
     return acc;
   }, {});
 
   const [formData, setFormData] = useState(initialState);
   const [loading, setLoading] = useState(false);
+  const widthClass = size === "md" ? "max-w-[520px]" : "max-w-[420px]";
 
   const handleChange = (e) => {
     setFormData({
@@ -36,7 +43,7 @@ export default function AuthForm({
 
     try {
       setLoading(true);
-      await onSubmit(formData);
+      await onSubmit?.(formData);
     } finally {
       setLoading(false);
     }
@@ -44,7 +51,7 @@ export default function AuthForm({
 
   return (
     <main className="grid min-h-screen place-items-center bg-[#F8FAFC] p-4">
-      <section className="w-full max-w-xl rounded-2xl border border-[#E2E8F0] bg-white p-6 shadow-xl sm:p-8">
+      <section className={`w-full ${widthClass} rounded-2xl border border-[#E2E8F0] bg-white p-6 shadow-xl sm:p-8`}>
         <Link href="/" className="mb-8 inline-flex items-center gap-3 font-medium">
           <span className="grid h-10 w-10 place-items-center rounded-2xl bg-[#EAF5FF] text-[#2E95F7]">
             EP
@@ -56,7 +63,7 @@ export default function AuthForm({
         <p className="mt-3 text-[#64748B]">{subtitle}</p>
 
         <form onSubmit={handleSubmit} className="mt-8 grid gap-4">
-          {fields.map((field) => (
+          {normalizedFields.map((field) => (
             <Input
               key={field.id}
               {...field}

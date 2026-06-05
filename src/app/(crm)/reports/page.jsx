@@ -1,17 +1,23 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import dynamic from "next/dynamic";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import api from "@/lib/axios";
-import AgentPerformance from "@/components/crm/reports/AgentPerformance";
-import DealAnalytics from "@/components/crm/reports/DealAnalytics";
-import FollowupAnalytics from "@/components/crm/reports/FollowupAnalytics";
-import LeadAnalytics from "@/components/crm/reports/LeadAnalytics";
-import PropertyAnalytics from "@/components/crm/reports/PropertyAnalytics";
 import ReportFilters from "@/components/crm/reports/ReportFilters";
-import ReportSummaryCards from "@/components/crm/reports/ReportSummaryCards";
-import RevenueOverview from "@/components/crm/reports/RevenueOverview";
+
+const ChartSkeleton = () => (
+  <div className="h-80 animate-pulse rounded-2xl border border-[#E2E8F0] bg-white" />
+);
+
+const AgentPerformance = dynamic(() => import("@/components/crm/reports/AgentPerformance"), { ssr: false, loading: ChartSkeleton });
+const DealAnalytics = dynamic(() => import("@/components/crm/reports/DealAnalytics"), { ssr: false, loading: ChartSkeleton });
+const FollowupAnalytics = dynamic(() => import("@/components/crm/reports/FollowupAnalytics"), { ssr: false, loading: ChartSkeleton });
+const LeadAnalytics = dynamic(() => import("@/components/crm/reports/LeadAnalytics"), { ssr: false, loading: ChartSkeleton });
+const PropertyAnalytics = dynamic(() => import("@/components/crm/reports/PropertyAnalytics"), { ssr: false, loading: ChartSkeleton });
+const ReportSummaryCards = dynamic(() => import("@/components/crm/reports/ReportSummaryCards"), { ssr: false });
+const RevenueOverview = dynamic(() => import("@/components/crm/reports/RevenueOverview"), { ssr: false, loading: ChartSkeleton });
 
 const initialFilters = {
   dateRange: "30d",
