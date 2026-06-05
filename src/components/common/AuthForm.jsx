@@ -29,7 +29,7 @@ export default function AuthForm({
 
   const [formData, setFormData] = useState(initialState);
   const [loading, setLoading] = useState(false);
-  const widthClass = size === "md" ? "max-w-[520px]" : "max-w-[420px]";
+  const widthClass = size === "md" ? "auth-card-md" : "auth-card-sm";
 
   const handleChange = (e) => {
     setFormData({
@@ -51,7 +51,7 @@ export default function AuthForm({
 
   return (
     <main className="grid min-h-screen place-items-center bg-[#F8FAFC] p-4">
-      <section className={`w-full ${widthClass} rounded-2xl border border-[#E2E8F0] bg-white p-6 shadow-xl sm:p-8`}>
+      <section className={`auth-card ${widthClass} rounded-2xl border border-[#E2E8F0] bg-white p-6 shadow-xl sm:p-8`}>
         <Link href="/" className="mb-8 inline-flex items-center gap-3 font-medium">
           <span className="grid h-10 w-10 place-items-center rounded-2xl bg-[#EAF5FF] text-[#2E95F7]">
             EP

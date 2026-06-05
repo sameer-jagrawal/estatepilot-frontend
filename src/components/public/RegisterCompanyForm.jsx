@@ -66,7 +66,7 @@ export default function RegisterCompanyForm({ compact = false }) {
 
   return (
     <section
-      className={`register-company-card reveal-panel w-full ${compact ? "max-w-[420px] p-4 sm:p-5" : "max-w-[520px] p-6 sm:p-8"}`}
+      className={`register-company-card reveal-panel ${compact ? "register-company-card-compact p-4 sm:p-5" : "p-6 sm:p-8"}`}
     >
       <div className={compact ? "mb-5" : "mb-8"}>
         {!compact ? (

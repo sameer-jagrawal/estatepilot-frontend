@@ -83,6 +83,26 @@ select {
   box-shadow: 0 10px 30px rgba(15, 23, 42, 0.045);
 }
 
+.auth-card {
+  width: min(100%, 420px);
+}
+
+.auth-card-sm {
+  max-width: 420px;
+}
+
+.auth-card-md,
+.register-company-card,
+.contact-form-card {
+  width: min(100%, 520px);
+  max-width: 520px;
+}
+
+.register-company-card-compact {
+  width: min(100%, 420px);
+  max-width: 420px;
+}
+
 .focus-ring {
   outline: none;
 }
