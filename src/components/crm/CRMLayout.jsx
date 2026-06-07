@@ -56,7 +56,7 @@ export default function CRMLayout({ children }) {
       <Sidebar role={user?.role || "owner"} company={user?.company || user?.tenant?.name || ""} open={open} onClose={() => setOpen(false)} />
       <div className="min-w-0 max-w-full lg:pl-[280px]">
         <Topbar onMenu={() => setOpen(true)} />
-        <main className="min-w-0 max-w-full overflow-x-hidden p-4 sm:p-6 xl:p-8">{children}</main>
+        <main className="crm-content min-w-0 max-w-full overflow-x-hidden p-4 sm:p-6 xl:p-8">{children}</main>
       </div>
     </div>
   );
