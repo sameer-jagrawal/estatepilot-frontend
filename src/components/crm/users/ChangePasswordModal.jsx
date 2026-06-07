@@ -8,6 +8,7 @@ import { toast } from "sonner";
 export default function ChangePasswordModal({ open, user, saving, onClose, onSubmit }) {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPasswords, setShowPasswords] = useState(false);
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -39,11 +40,15 @@ export default function ChangePasswordModal({ open, user, saving, onClose, onSub
             <div className="mt-6 grid gap-4">
               <label className="grid gap-2 text-sm font-medium text-[#0F172A]">
                 New password
-                <input type="password" minLength={6} value={newPassword} onChange={(event) => setNewPassword(event.target.value)} className="h-12 rounded-2xl border border-[#E2E8F0] px-4 text-sm font-semibold outline-none transition focus:border-[#4DA8FF] focus:ring-4 focus:ring-[#EAF5FF]" />
+                <input type={showPasswords ? "text" : "password"} minLength={6} value={newPassword} onChange={(event) => setNewPassword(event.target.value)} className="h-12 rounded-2xl border border-[#E2E8F0] px-4 text-sm font-semibold outline-none transition focus:border-[#4DA8FF] focus:ring-4 focus:ring-[#EAF5FF]" />
               </label>
               <label className="grid gap-2 text-sm font-medium text-[#0F172A]">
                 Confirm password
-                <input type="password" minLength={6} value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} className="h-12 rounded-2xl border border-[#E2E8F0] px-4 text-sm font-semibold outline-none transition focus:border-[#4DA8FF] focus:ring-4 focus:ring-[#EAF5FF]" />
+                <input type={showPasswords ? "text" : "password"} minLength={6} value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} className="h-12 rounded-2xl border border-[#E2E8F0] px-4 text-sm font-semibold outline-none transition focus:border-[#4DA8FF] focus:ring-4 focus:ring-[#EAF5FF]" />
+              </label>
+              <label className="flex items-center gap-2 text-sm font-semibold text-[#64748B]">
+                <input type="checkbox" checked={showPasswords} onChange={(event) => setShowPasswords(event.target.checked)} className="h-4 w-4 accent-[#4DA8FF]" />
+                Show passwords
               </label>
             </div>
 

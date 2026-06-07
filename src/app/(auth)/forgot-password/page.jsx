@@ -1,6 +1,19 @@
+"use client";
+
+import { toast } from "sonner";
 import AuthForm from "@/components/common/AuthForm";
+import api from "@/lib/axios";
 
 export default function ForgotPasswordPage() {
+  const handleSubmit = async (formData) => {
+    try {
+      const response = await api.post("auth/forgot-password", formData);
+      toast.success(response?.data?.message || "Reset link sent");
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Unable to send reset link");
+    }
+  };
+
   return (
     <AuthForm
       title="Forgot password"
@@ -10,6 +23,7 @@ export default function ForgotPasswordPage() {
       footerText="Remembered it?"
       footerHref="/login"
       footerLabel="Login"
+      onSubmit={handleSubmit}
     />
   );
 }

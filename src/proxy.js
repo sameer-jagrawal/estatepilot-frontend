@@ -12,6 +12,8 @@ const protectedRoutes = [
   "/notes",
   "/users",
   "/settings",
+  "/profile",
+  "/activity-logs",
 ];
 
 const adminProtectedRoutes = [
@@ -73,10 +75,6 @@ export function proxy(request) {
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
-  if (isAuthRoute && token) {
-    return NextResponse.redirect(new URL("/dashboard", request.url));
-  }
-
   if (isAdminAuthRoute && adminToken && adminRole === "super-admin") {
     return NextResponse.redirect(new URL("/admin/dashboard", request.url));
   }
@@ -96,6 +94,8 @@ export const config = {
     "/notes/:path*",
     "/users/:path*",
     "/settings/:path*",
+    "/profile/:path*",
+    "/activity-logs/:path*",
 
     "/admin/dashboard/:path*",
     "/admin/tenants/:path*",

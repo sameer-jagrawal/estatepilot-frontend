@@ -24,7 +24,7 @@ const fields = [
   { id: "ownerName", name: "ownerName", type: "text", placeholder: "Owner Name" },
   { id: "ownerEmail", name: "ownerEmail", type: "email", placeholder: "Owner Email" },
   { id: "ownerPhone", name: "ownerPhone", type: "text", placeholder: "Owner Phone" },
-  { id: "password", name: "password", type: "password", placeholder: "Password" },
+  { id: "password", name: "password", type: "password", placeholder: "Password", showPasswordToggle: true },
 ];
 
 export default function RegisterCompanyForm({ compact = false }) {

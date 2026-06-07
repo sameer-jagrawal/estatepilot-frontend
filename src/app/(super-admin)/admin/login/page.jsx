@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ShieldCheck } from "lucide-react";
+import { Eye, EyeOff, ShieldCheck } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import api from "@/lib/axios";
@@ -9,6 +9,7 @@ import api from "@/lib/axios";
 export default function AdminLoginPage() {
   const [form, setForm] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const submit = async (event) => {
     event.preventDefault();
@@ -67,14 +68,25 @@ export default function AdminLoginPage() {
           </label>
           <label className="grid gap-1 text-sm font-medium">
             Password
-            <input
-              type="password"
-              required
-              value={form.password}
-              onChange={(event) => setForm((current) => ({ ...current, password: event.target.value }))}
-              className="h-11 rounded-md border border-[#DDE5EF] bg-[#F6F8FB] px-3 font-normal outline-none transition focus:border-[#2E95F7] focus:bg-white focus:ring-4 focus:ring-[#2E95F7]/10"
-              placeholder="Password"
-            />
+            <span className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                required
+                value={form.password}
+                onChange={(event) => setForm((current) => ({ ...current, password: event.target.value }))}
+                className="h-11 w-full rounded-md border border-[#DDE5EF] bg-[#F6F8FB] px-3 pr-24 font-normal outline-none transition focus:border-[#2E95F7] focus:bg-white focus:ring-4 focus:ring-[#2E95F7]/10"
+                placeholder="Password"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((current) => !current)}
+                className="absolute right-2 top-1/2 inline-flex -translate-y-1/2 items-center gap-1 rounded-md px-2 py-1 text-xs font-semibold text-[#667085] transition hover:bg-white hover:text-[#0B1220]"
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? <EyeOff size={14} /> : <Eye size={14} />}
+                {showPassword ? "Hide" : "Show"}
+              </button>
+            </span>
           </label>
           <button
             type="submit"

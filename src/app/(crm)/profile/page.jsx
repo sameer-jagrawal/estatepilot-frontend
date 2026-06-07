@@ -225,6 +225,7 @@ function ChangePasswordModal({ open, saving, onClose, onSubmit }) {
     newPassword: "",
     confirmPassword: "",
   });
+  const [showPasswords, setShowPasswords] = useState(false);
 
   const updateField = (field, value) => {
     setForm((current) => ({ ...current, [field]: value }));
@@ -290,22 +291,26 @@ function ChangePasswordModal({ open, saving, onClose, onSubmit }) {
             <div className="mt-6 grid gap-4">
               <TextInput
                 label="Current Password"
-                type="password"
+                type={showPasswords ? "text" : "password"}
                 value={form.currentPassword}
                 onChange={(value) => updateField("currentPassword", value)}
               />
               <TextInput
                 label="New Password"
-                type="password"
+                type={showPasswords ? "text" : "password"}
                 value={form.newPassword}
                 onChange={(value) => updateField("newPassword", value)}
               />
               <TextInput
                 label="Confirm Password"
-                type="password"
+                type={showPasswords ? "text" : "password"}
                 value={form.confirmPassword}
                 onChange={(value) => updateField("confirmPassword", value)}
               />
+              <label className="flex items-center gap-2 text-sm font-semibold text-[#64748B]">
+                <input type="checkbox" checked={showPasswords} onChange={(event) => setShowPasswords(event.target.checked)} className="h-4 w-4 accent-[#4DA8FF]" />
+                Show passwords
+              </label>
             </div>
 
             <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">

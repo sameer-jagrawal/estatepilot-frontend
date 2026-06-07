@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { X } from "lucide-react";
+import { Eye, EyeOff, X } from "lucide-react";
 import { toast } from "sonner";
 
 export const USER_PERMISSIONS = [
@@ -38,6 +38,7 @@ function Field({ label, children }) {
 
 export default function UserFormModal({ open, mode = "create", user, saving, onClose, onSubmit }) {
   const [form, setForm] = useState(() => initialForm(user, mode));
+  const [showPassword, setShowPassword] = useState(false);
 
   const updateField = (field, value) => setForm((current) => ({ ...current, [field]: value }));
   const togglePermission = (permission) => {
@@ -95,7 +96,13 @@ export default function UserFormModal({ open, mode = "create", user, saving, onC
               </Field>
               {mode === "create" ? (
                 <Field label="Password">
-                  <input required type="password" minLength={6} value={form.password} onChange={(event) => updateField("password", event.target.value)} className="h-12 rounded-2xl border border-[#E2E8F0] px-4 text-sm font-semibold outline-none transition focus:border-[#4DA8FF] focus:ring-4 focus:ring-[#EAF5FF]" />
+                  <span className="relative">
+                    <input required type={showPassword ? "text" : "password"} minLength={6} value={form.password} onChange={(event) => updateField("password", event.target.value)} className="h-12 w-full rounded-2xl border border-[#E2E8F0] px-4 pr-24 text-sm font-semibold outline-none transition focus:border-[#4DA8FF] focus:ring-4 focus:ring-[#EAF5FF]" />
+                    <button type="button" onClick={() => setShowPassword((current) => !current)} className="absolute right-3 top-1/2 inline-flex -translate-y-1/2 items-center gap-1 rounded-lg px-2 py-1 text-xs font-semibold text-[#64748B] transition hover:bg-[#F8FAFC] hover:text-[#0F172A]" aria-label={showPassword ? "Hide password" : "Show password"}>
+                      {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+                      {showPassword ? "Hide" : "Show"}
+                    </button>
+                  </span>
                 </Field>
               ) : null}
               <Field label="Role">

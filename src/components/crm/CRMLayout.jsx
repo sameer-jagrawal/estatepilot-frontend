@@ -1,13 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import api from "@/lib/axios";
 import Sidebar from "./Sidebar";
 import Topbar from "./Topbar";
 
 export default function CRMLayout({ children }) {
+  const pathname = usePathname();
   const [open, setOpen] = useState(false);
-  const [user, setUser] = useState({ role: "owner", company: "" });
+  const [user, setUser] = useState(null);
+  const [checkingAuth, setCheckingAuth] = useState(true);
 
   useEffect(() => {
     let active = true;
@@ -24,7 +27,13 @@ export default function CRMLayout({ children }) {
           });
         }
       } catch {
-        if (active) setUser({ role: "owner", company: "" });
+        if (active && typeof window !== "undefined") {
+          const search = window.location.search || "";
+          const nextPath = `${pathname || "/dashboard"}${search}`;
+          window.location.assign(`/login?next=${encodeURIComponent(nextPath)}`);
+        }
+      } finally {
+        if (active) setCheckingAuth(false);
       }
     }
 
@@ -32,7 +41,15 @@ export default function CRMLayout({ children }) {
     return () => {
       active = false;
     };
-  }, []);
+  }, [pathname]);
+
+  if (checkingAuth || !user) {
+    return (
+      <div className="grid min-h-screen place-items-center bg-[#F8FAFC] p-4 text-sm font-semibold text-[#64748B]">
+        Checking your session...
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen overflow-x-hidden bg-[#F8FAFC]">

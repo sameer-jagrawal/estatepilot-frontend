@@ -20,6 +20,7 @@ export default function AuthForm({
   const normalizedFields = fields.map((field) => ({
     ...field,
     name: field.name || field.id,
+    showPasswordToggle: field.showPasswordToggle ?? field.type === "password",
   }));
 
   const initialState = fields.reduce((acc, field) => {
