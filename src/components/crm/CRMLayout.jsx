@@ -45,9 +45,7 @@ export default function CRMLayout({ children }) {
 
   if (checkingAuth || !user) {
     return (
-      <div className="grid min-h-screen place-items-center bg-[#F8FAFC] p-4 text-sm font-semibold text-[#64748B]">
-        Checking your session...
-      </div>
+      <div className="min-h-screen bg-[#F8FAFC]" aria-hidden="true" />
     );
   }
 

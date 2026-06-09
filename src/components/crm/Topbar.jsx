@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { AlertTriangle, Bell, ChevronDown, Loader2, LogOut, Menu, Search, X } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { toast } from "sonner";
@@ -17,6 +18,10 @@ function formatRole(value) {
   return String(value).replace(/[-_]/g, " ");
 }
 
+function getProfileImage(user) {
+  return user?.profileImage || user?.profilePhoto || user?.avatar || user?.photo || user?.image || "";
+}
+
 export default function Topbar({ onMenu }) {
   const { user: fallbackUser } = useAuth();
   const [currentUser, setCurrentUser] = useState(fallbackUser);
@@ -24,6 +29,7 @@ export default function Topbar({ onMenu }) {
   const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
   const user = currentUser || fallbackUser;
+  const profileImage = getProfileImage(user);
 
   const loadCurrentUser = useCallback(async () => {
     try {
@@ -110,9 +116,20 @@ export default function Topbar({ onMenu }) {
               onClick={() => setOpen((value) => !value)}
               className="flex h-11 items-center gap-3 rounded-2xl border border-[#E2E8F0] bg-white px-2.5 transition hover:bg-[#F8FAFC] sm:px-3"
             >
-              <span className="grid h-8 w-8 place-items-center rounded-full bg-[#EAF5FF] text-sm font-semibold text-[#2E95F7]">
-                {getInitial(user?.name)}
-              </span>
+              {profileImage ? (
+                <Image
+                  src={profileImage}
+                  alt={user?.name ? `${user.name} profile` : "User profile"}
+                  width={32}
+                  height={32}
+                  unoptimized={profileImage.startsWith("data:")}
+                  className="h-8 w-8 rounded-full object-cover"
+                />
+              ) : (
+                <span className="grid h-8 w-8 place-items-center rounded-full bg-[#EAF5FF] text-sm font-semibold text-[#2E95F7]">
+                  {getInitial(user?.name)}
+                </span>
+              )}
               <span className="hidden text-left md:block">
                 <span className="block text-sm font-semibold leading-4 text-[#0F172A]">{user?.name || "Logged-in User"}</span>
                 <span className="block text-xs font-semibold capitalize text-[#64748B]">{formatRole(user?.role)}</span>

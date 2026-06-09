@@ -40,6 +40,11 @@ function textToList(value) {
     .filter(Boolean);
 }
 
+function listToText(value) {
+  if (Array.isArray(value)) return value.filter(Boolean).join(", ");
+  return String(value || "");
+}
+
 function createExistingImageItem(value, index) {
   return {
     id: `existing-${index}-${String(value).slice(0, 16)}`,
