@@ -36,6 +36,7 @@ const authRoutes = [
 
 const adminAuthRoutes = [
   "/admin/login",
+  "/admin/register",
 ];
 
 export function proxy(request) {
@@ -110,6 +111,8 @@ export const config = {
     "/verify-otp",
     "/forgot-password",
     "/reset-password",
+    "/admin",
     "/admin/login",
+    "/admin/register",
   ],
 };

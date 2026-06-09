@@ -18,16 +18,27 @@ api.interceptors.response.use(
       typeof window !== "undefined"
         ? `${window.location.pathname}${window.location.search}`
         : "";
-    const isTenantApi = !error?.config?.url?.startsWith("super-admin");
+    const isAdminApi =
+      error?.config?.url?.startsWith("super-admin") ||
+      error?.config?.url?.startsWith("admin/");
+    const isTenantApi = !isAdminApi;
     const isAuthPage =
       typeof window !== "undefined" &&
       ["/login", "/register-company", "/verify-otp", "/forgot-password", "/reset-password"].includes(
         window.location.pathname
       );
+    const isAdminAuthPage =
+      typeof window !== "undefined" &&
+      ["/admin/login", "/admin/register"].includes(window.location.pathname);
 
     if (status === 401 && isTenantApi && typeof window !== "undefined" && !isAuthPage) {
       const next = currentPath && currentPath !== "/" ? `?next=${encodeURIComponent(currentPath)}` : "";
       window.location.assign(`/login${next}`);
+    }
+
+    if (status === 401 && isAdminApi && typeof window !== "undefined" && !isAdminAuthPage) {
+      const next = currentPath && currentPath !== "/" ? `?next=${encodeURIComponent(currentPath)}` : "";
+      window.location.assign(`/admin/login${next}`);
     }
 
     return Promise.reject(error);

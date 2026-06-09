@@ -5,7 +5,7 @@ import AdminLayout from "@/components/admin/AdminLayout";
 export default function SuperAdminRouteLayout({ children }) {
   const pathname = usePathname();
 
-  if (pathname === "/admin/login") {
+  if (pathname === "/admin/login" || pathname === "/admin/register") {
     return children;
   }
 

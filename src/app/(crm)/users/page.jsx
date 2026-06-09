@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { Plus, Users, X } from "lucide-react";
 import { toast } from "sonner";
@@ -59,6 +60,7 @@ function calculateSummary(usersList) {
 }
 
 export default function UsersPage() {
+  const router = useRouter();
   const { user: currentUser } = useAuth("tenant");
   const [usersList, setUsersList] = useState([]);
   const [search, setSearch] = useState("");
@@ -125,8 +127,14 @@ export default function UsersPage() {
         await api.patch(`users/${editingUser._id}`, payload);
         toast.success("User updated successfully");
       } else {
-        await api.post("users/create", payload);
+        const response = await api.post("users/create", payload);
+        const createdUser = extractItem(response);
         toast.success("User created successfully");
+        if (createdUser?._id && createdUser?.email) {
+          setModalOpen(false);
+          router.push(`/users/verify?userId=${createdUser._id}&email=${encodeURIComponent(createdUser.email)}`);
+          return;
+        }
       }
       setModalOpen(false);
       await fetchUsers();
