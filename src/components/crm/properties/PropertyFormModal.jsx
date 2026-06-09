@@ -1,9 +1,11 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { ImagePlus, Trash2, X } from "lucide-react";
+import { ImagePlus, Loader2, Trash2, X } from "lucide-react";
+import { toast } from "sonner";
 import Loader from "@/components/common/Loader";
+import { readFileAsDataUrl, validateImageFile } from "@/lib/imageValidation";
 
 export const PROPERTY_TYPE_OPTIONS = ["flat", "villa", "plot", "commercial", "office", "shop"];
 export const PURPOSE_OPTIONS = ["sale", "rent"];
@@ -26,15 +28,10 @@ const emptyProperty = {
   address: "",
   description: "",
   amenities: "",
-  images: "",
+  images: [],
   status: "available",
   isFeatured: false,
 };
-
-function listToText(value) {
-  if (Array.isArray(value)) return value.join(", ");
-  return value || "";
-}
 
 function textToList(value) {
   return String(value || "")
@@ -43,13 +40,24 @@ function textToList(value) {
     .filter(Boolean);
 }
 
-const readFileAsDataUrl = (file) =>
-  new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
+function createExistingImageItem(value, index) {
+  return {
+    id: `existing-${index}-${String(value).slice(0, 16)}`,
+    value,
+    previewUrl: value,
+    objectUrl: false,
+  };
+}
+
+function normalizeInitialImages(value) {
+  if (Array.isArray(value)) return value.filter(Boolean).map(createExistingImageItem);
+  return textToList(value).map(createExistingImageItem);
+}
+
+function normalizeImagePayload(images) {
+  if (!Array.isArray(images)) return textToList(images);
+  return images.map((image) => image?.value || image).filter(Boolean);
+}
 
 export function buildPropertyPayload(form) {
   return {
@@ -59,7 +67,7 @@ export function buildPropertyPayload(form) {
     bedrooms: Number(form.bedrooms || 0),
     bathrooms: Number(form.bathrooms || 0),
     amenities: textToList(form.amenities),
-    images: textToList(form.images),
+    images: normalizeImagePayload(form.images),
     isFeatured: Boolean(form.isFeatured),
   };
 }
@@ -81,7 +89,7 @@ export default function PropertyFormModal({ open, mode = "create", property, sav
       address: property?.address || emptyProperty.address,
       description: property?.description || emptyProperty.description,
       amenities: listToText(property?.amenities),
-      images: listToText(property?.images),
+      images: normalizeInitialImages(property?.images),
       status: property?.status || emptyProperty.status,
       isFeatured: Boolean(property?.isFeatured),
     }),
@@ -89,24 +97,80 @@ export default function PropertyFormModal({ open, mode = "create", property, sav
   );
 
   const [form, setForm] = useState(initialForm);
+  const [imageProcessing, setImageProcessing] = useState(false);
+  const objectUrlsRef = useRef(new Set());
+
+  useEffect(() => {
+    const objectUrls = objectUrlsRef.current;
+    return () => {
+      objectUrls.forEach((url) => URL.revokeObjectURL(url));
+      objectUrls.clear();
+    };
+  }, []);
 
   const updateField = (field, value) => {
     setForm((current) => ({ ...current, [field]: value }));
   };
 
   const addPropertyImages = async (files) => {
-    const imageFiles = Array.from(files || []).filter((file) => file.type.startsWith("image/"));
+    const selectedFiles = Array.from(files || []);
+    if (!selectedFiles.length) return;
 
-    if (!imageFiles.length) return;
+    const validFiles = [];
 
-    const dataUrls = await Promise.all(imageFiles.map((file) => readFileAsDataUrl(file)));
-    const currentImages = textToList(form.images);
-    updateField("images", [...currentImages, ...dataUrls].join(", "));
+    selectedFiles.forEach((file) => {
+      const error = validateImageFile(file);
+      if (error) {
+        toast.error(`${file.name}: ${error}`);
+        return;
+      }
+      validFiles.push(file);
+    });
+
+    if (!validFiles.length) return;
+
+    try {
+      setImageProcessing(true);
+      const nextImages = await Promise.all(
+        validFiles.map(async (file) => {
+          const previewUrl = URL.createObjectURL(file);
+          objectUrlsRef.current.add(previewUrl);
+          return {
+            id: `${file.name}-${file.lastModified}-${previewUrl}`,
+            file,
+            previewUrl,
+            value: await readFileAsDataUrl(file),
+            objectUrl: true,
+          };
+        })
+      );
+
+      setForm((current) => ({
+        ...current,
+        images: [...(Array.isArray(current.images) ? current.images : normalizeInitialImages(current.images)), ...nextImages],
+      }));
+    } catch {
+      toast.error("Unable to process selected image");
+    } finally {
+      setImageProcessing(false);
+    }
   };
 
   const removePropertyImage = (index) => {
-    const nextImages = textToList(form.images).filter((_, itemIndex) => itemIndex !== index);
-    updateField("images", nextImages.join(", "));
+    setForm((current) => {
+      const currentImages = Array.isArray(current.images) ? current.images : normalizeInitialImages(current.images);
+      const removed = currentImages[index];
+
+      if (removed?.objectUrl && removed.previewUrl) {
+        URL.revokeObjectURL(removed.previewUrl);
+        objectUrlsRef.current.delete(removed.previewUrl);
+      }
+
+      return {
+        ...current,
+        images: currentImages.filter((_, itemIndex) => itemIndex !== index),
+      };
+    });
   };
 
   const handleSubmit = (event) => {
@@ -178,11 +242,10 @@ export default function PropertyFormModal({ open, mode = "create", property, sav
                 <TextArea label="Amenities" value={form.amenities} onChange={(value) => updateField("amenities", value)} placeholder="lift, parking, gym" />
                 <div className="md:col-span-2">
                   <PropertyImageInput
-                    images={textToList(form.images)}
+                    images={Array.isArray(form.images) ? form.images : normalizeInitialImages(form.images)}
                     onAdd={addPropertyImages}
                     onRemove={removePropertyImage}
-                    imageText={form.images}
-                    onTextChange={(value) => updateField("images", value)}
+                    processing={imageProcessing}
                   />
                 </div>
               </div>
@@ -211,7 +274,7 @@ export default function PropertyFormModal({ open, mode = "create", property, sav
   );
 }
 
-function PropertyImageInput({ images, onAdd, onRemove, imageText, onTextChange }) {
+function PropertyImageInput({ images, onAdd, onRemove, processing }) {
   return (
     <div className="grid gap-3">
       <div className="flex items-center justify-between gap-3">
@@ -231,17 +294,17 @@ function PropertyImageInput({ images, onAdd, onRemove, imageText, onTextChange }
         />
         <span className="grid justify-items-center gap-2">
           <span className="grid h-12 w-12 place-items-center rounded-full bg-white text-[#2E95F7] shadow-sm">
-            <ImagePlus size={22} />
+            {processing ? <Loader2 className="animate-spin" size={22} /> : <ImagePlus size={22} />}
           </span>
-          <span className="text-sm font-semibold text-[#0F172A]">Select images from device</span>
+          <span className="text-sm font-semibold text-[#0F172A]">{processing ? "Processing images..." : "Select images from device"}</span>
           <span className="text-xs font-medium text-[#64748B]">Selected images appear below and can be changed later from edit.</span>
         </span>
       </label>
       {images.length ? (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {images.map((image, index) => (
-            <div key={`${image.slice(0, 32)}-${index}`} className="group relative overflow-hidden rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC]">
-              <div className="h-32 bg-cover bg-center" style={{ backgroundImage: `url(${image})` }} />
+            <div key={image.id || `${image.previewUrl}-${index}`} className="group relative overflow-hidden rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC]">
+              <div className="h-32 bg-cover bg-center" style={{ backgroundImage: `url(${image.previewUrl || image.value})` }} />
               <button
                 type="button"
                 onClick={() => onRemove(index)}
@@ -254,17 +317,6 @@ function PropertyImageInput({ images, onAdd, onRemove, imageText, onTextChange }
           ))}
         </div>
       ) : null}
-      <details className="rounded-2xl border border-[#E2E8F0] bg-white p-4">
-        <summary className="cursor-pointer text-sm font-semibold text-[#0F172A]">Add or edit image URLs</summary>
-        <div className="mt-3">
-          <TextArea
-            label="Image URLs or saved image data"
-            value={imageText}
-            onChange={onTextChange}
-            placeholder="Optional: https://image-one.jpg, https://image-two.jpg"
-          />
-        </div>
-      </details>
     </div>
   );
 }

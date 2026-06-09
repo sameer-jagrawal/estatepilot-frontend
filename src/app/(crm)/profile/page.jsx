@@ -554,10 +554,10 @@ export default function ProfilePage() {
           <div className="border-b border-[#E2E8F0] bg-[#F8FAFC] px-5 py-5 sm:px-6">
             <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-                <div className="relative grid h-24 w-24 shrink-0 place-items-center rounded-2xl bg-[#EAF5FF] text-3xl font-semibold text-[#2E95F7] ring-8 ring-white">
+                <div className="relative grid h-24 w-24 shrink-0 place-items-center rounded-full bg-[#EAF5FF] text-3xl font-semibold text-[#2E95F7] ring-8 ring-white">
                   {normalizedProfile?.profileImage ? (
                     <span
-                      className="h-full w-full rounded-2xl bg-cover bg-center"
+                      className="h-full w-full rounded-full bg-cover bg-center"
                       style={{ backgroundImage: `url(${normalizedProfile.profileImage})` }}
                       aria-label={normalizedProfile?.name || "Profile"}
                     />
@@ -630,7 +630,7 @@ export default function ProfilePage() {
                     aspect={1}
                     outputWidth={512}
                     optionalText="Optional"
-                    rounded="rounded-2xl"
+                    variant="circle"
                   />
 
                   <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
