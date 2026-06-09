@@ -1,10 +1,16 @@
 "use client";
 
-import { Bell, LogOut, Menu, Search } from "lucide-react";
+import { useState } from "react";
+import Link from "next/link";
+import { Bell, LogOut, Menu, Search, UserRound, X } from "lucide-react";
 import { toast } from "sonner";
 import api from "@/lib/axios";
+import useAuth from "@/hooks/useAuth";
 
 export default function AdminTopbar({ onMenu }) {
+  const { user } = useAuth("admin");
+  const [confirmOpen, setConfirmOpen] = useState(false);
+
   const handleLogout = async () => {
     try {
       await api.post("super-admin/logout", {}, { withCredentials: true });
@@ -45,25 +51,53 @@ export default function AdminTopbar({ onMenu }) {
           <Bell size={18} />
         </button>
 
-        <div className="hidden items-center gap-3 border border-[#DDE5EF] bg-white px-3 py-2 sm:flex">
+        <Link href="/admin/profile" className="hidden items-center gap-3 border border-[#DDE5EF] bg-white px-3 py-2 transition hover:bg-[#F6F8FB] sm:flex">
           <span className="grid h-8 w-8 place-items-center rounded-md bg-[#EAF5FF] text-sm font-semibold text-[#2E95F7]">
-            A
+            {user?.name?.[0]?.toUpperCase() || "A"}
           </span>
           <span>
-            <span className="block text-sm font-medium leading-4 text-[#0B1220]">Admin</span>
+            <span className="block text-sm font-medium leading-4 text-[#0B1220]">{user?.name || "Admin"}</span>
             <span className="block text-xs text-[#667085]">Super admin</span>
           </span>
-        </div>
+        </Link>
 
         <button
           type="button"
-          onClick={handleLogout}
+          onClick={() => setConfirmOpen(true)}
           className="inline-flex h-10 items-center gap-2 rounded-md border border-[#DDE5EF] bg-white px-3 text-sm font-semibold text-[#334155] transition hover:bg-[#F6F8FB] hover:text-[#0B1220]"
         >
           <LogOut size={16} />
           <span className="hidden md:inline">Logout</span>
         </button>
       </div>
+      {confirmOpen ? (
+        <div className="fixed inset-0 z-50 grid place-items-center bg-[#0B1220]/35 p-4">
+          <section className="w-full max-w-md border border-[#DDE5EF] bg-white shadow-[0_30px_80px_rgba(15,23,42,0.2)]">
+            <div className="flex items-center justify-between border-b border-[#DDE5EF] px-5 py-4">
+              <div className="flex items-center gap-3">
+                <span className="grid h-10 w-10 place-items-center rounded-md bg-[#EAF5FF] text-[#2E95F7]">
+                  <UserRound size={18} />
+                </span>
+                <div>
+                  <h2 className="text-base font-semibold text-[#0B1220]">Logout admin?</h2>
+                  <p className="text-sm text-[#667085]">Your admin session will be closed.</p>
+                </div>
+              </div>
+              <button type="button" onClick={() => setConfirmOpen(false)} className="text-[#667085]" aria-label="Close logout confirmation">
+                <X size={18} />
+              </button>
+            </div>
+            <div className="flex justify-end gap-2 p-5">
+              <button type="button" onClick={() => setConfirmOpen(false)} className="rounded-md border border-[#DDE5EF] px-4 py-2 text-sm font-medium text-[#334155]">
+                Cancel
+              </button>
+              <button type="button" onClick={handleLogout} className="rounded-md bg-[#DC2626] px-4 py-2 text-sm font-medium text-white hover:bg-[#B91C1C]">
+                Logout
+              </button>
+            </div>
+          </section>
+        </div>
+      ) : null}
     </header>
   );
 }

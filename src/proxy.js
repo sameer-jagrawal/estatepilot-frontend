@@ -23,6 +23,7 @@ const adminProtectedRoutes = [
   "/admin/payments",
   "/admin/support",
   "/admin/analytics",
+  "/admin/profile",
   "/admin/settings",
 ];
 
@@ -104,6 +105,7 @@ export const config = {
     "/admin/payments/:path*",
     "/admin/support/:path*",
     "/admin/analytics/:path*",
+    "/admin/profile/:path*",
     "/admin/settings/:path*",
 
     "/login",

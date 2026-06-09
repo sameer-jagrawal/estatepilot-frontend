@@ -12,6 +12,7 @@ import {
   LifeBuoy,
   Settings,
   Tags,
+  UserRound,
   X,
 } from "lucide-react";
 
@@ -22,6 +23,7 @@ export const adminNavItems = [
   { label: "Payments", href: "/admin/payments", icon: CreditCard },
   { label: "Support", href: "/admin/support", icon: LifeBuoy },
   { label: "Analytics", href: "/admin/analytics", icon: BarChart3 },
+  { label: "Profile", href: "/admin/profile", icon: UserRound },
   { label: "Settings", href: "/admin/settings", icon: Settings },
 ];
 

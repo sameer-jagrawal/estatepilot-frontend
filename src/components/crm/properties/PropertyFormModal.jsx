@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { X } from "lucide-react";
+import { ImagePlus, Trash2, X } from "lucide-react";
 import Loader from "@/components/common/Loader";
 
 export const PROPERTY_TYPE_OPTIONS = ["flat", "villa", "plot", "commercial", "office", "shop"];
@@ -42,6 +42,14 @@ function textToList(value) {
     .map((item) => item.trim())
     .filter(Boolean);
 }
+
+const readFileAsDataUrl = (file) =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
 
 export function buildPropertyPayload(form) {
   return {
@@ -84,6 +92,21 @@ export default function PropertyFormModal({ open, mode = "create", property, sav
 
   const updateField = (field, value) => {
     setForm((current) => ({ ...current, [field]: value }));
+  };
+
+  const addPropertyImages = async (files) => {
+    const imageFiles = Array.from(files || []).filter((file) => file.type.startsWith("image/"));
+
+    if (!imageFiles.length) return;
+
+    const dataUrls = await Promise.all(imageFiles.map((file) => readFileAsDataUrl(file)));
+    const currentImages = textToList(form.images);
+    updateField("images", [...currentImages, ...dataUrls].join(", "));
+  };
+
+  const removePropertyImage = (index) => {
+    const nextImages = textToList(form.images).filter((_, itemIndex) => itemIndex !== index);
+    updateField("images", nextImages.join(", "));
   };
 
   const handleSubmit = (event) => {
@@ -153,7 +176,15 @@ export default function PropertyFormModal({ open, mode = "create", property, sav
                 <TextArea label="Address" value={form.address} onChange={(value) => updateField("address", value)} />
                 <TextArea label="Description" value={form.description} onChange={(value) => updateField("description", value)} />
                 <TextArea label="Amenities" value={form.amenities} onChange={(value) => updateField("amenities", value)} placeholder="lift, parking, gym" />
-                <TextArea label="Images" value={form.images} onChange={(value) => updateField("images", value)} placeholder="https://image-one.jpg, https://image-two.jpg" />
+                <div className="md:col-span-2">
+                  <PropertyImageInput
+                    images={textToList(form.images)}
+                    onAdd={addPropertyImages}
+                    onRemove={removePropertyImage}
+                    imageText={form.images}
+                    onTextChange={(value) => updateField("images", value)}
+                  />
+                </div>
               </div>
 
               <div className="flex flex-col-reverse gap-3 border-t border-[#E2E8F0] pt-5 sm:flex-row sm:justify-end">
@@ -177,6 +208,64 @@ export default function PropertyFormModal({ open, mode = "create", property, sav
         </motion.div>
       ) : null}
     </AnimatePresence>
+  );
+}
+
+function PropertyImageInput({ images, onAdd, onRemove, imageText, onTextChange }) {
+  return (
+    <div className="grid gap-3">
+      <div className="flex items-center justify-between gap-3">
+        <span className="text-sm font-semibold text-[#0F172A]">Property Images</span>
+        <span className="text-xs font-semibold text-[#94A3B8]">Optional</span>
+      </div>
+      <label className="grid min-h-36 cursor-pointer place-items-center rounded-2xl border border-dashed border-[#CBD5E1] bg-[#F8FAFC] p-5 text-center transition hover:bg-white">
+        <input
+          type="file"
+          accept="image/*"
+          multiple
+          className="hidden"
+          onChange={(event) => {
+            onAdd(event.target.files);
+            event.target.value = "";
+          }}
+        />
+        <span className="grid justify-items-center gap-2">
+          <span className="grid h-12 w-12 place-items-center rounded-full bg-white text-[#2E95F7] shadow-sm">
+            <ImagePlus size={22} />
+          </span>
+          <span className="text-sm font-semibold text-[#0F172A]">Select images from device</span>
+          <span className="text-xs font-medium text-[#64748B]">Selected images appear below and can be changed later from edit.</span>
+        </span>
+      </label>
+      {images.length ? (
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {images.map((image, index) => (
+            <div key={`${image.slice(0, 32)}-${index}`} className="group relative overflow-hidden rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC]">
+              <div className="h-32 bg-cover bg-center" style={{ backgroundImage: `url(${image})` }} />
+              <button
+                type="button"
+                onClick={() => onRemove(index)}
+                className="absolute right-2 top-2 grid h-9 w-9 place-items-center rounded-full bg-white text-[#DC2626] opacity-95 shadow-sm transition hover:bg-[#FEF2F2]"
+                aria-label="Remove property image"
+              >
+                <Trash2 size={16} />
+              </button>
+            </div>
+          ))}
+        </div>
+      ) : null}
+      <details className="rounded-2xl border border-[#E2E8F0] bg-white p-4">
+        <summary className="cursor-pointer text-sm font-semibold text-[#0F172A]">Add or edit image URLs</summary>
+        <div className="mt-3">
+          <TextArea
+            label="Image URLs or saved image data"
+            value={imageText}
+            onChange={onTextChange}
+            placeholder="Optional: https://image-one.jpg, https://image-two.jpg"
+          />
+        </div>
+      </details>
+    </div>
   );
 }
 

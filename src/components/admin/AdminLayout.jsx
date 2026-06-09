@@ -17,7 +17,7 @@ export default function AdminLayout({ children }) {
           initial={{ opacity: 0, y: 6 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.18, ease: "easeOut" }}
-          className="mx-auto w-full max-w-[1480px] px-4 py-5 sm:px-6 lg:px-8"
+          className="mx-auto w-full max-w-[1180px] px-4 py-5 sm:px-6 lg:px-8"
         >
           {children}
         </motion.main>

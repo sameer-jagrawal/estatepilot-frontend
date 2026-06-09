@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   Bell,
@@ -26,6 +25,7 @@ import {
 import { toast } from "sonner";
 import api from "@/lib/axios";
 import useAuth from "@/hooks/useAuth";
+import ImageCropInput from "@/components/common/ImageCropInput";
 
 const fallbackProfile = {
   name: "User",
@@ -88,12 +88,6 @@ function getStatus(user) {
 function titleCase(value) {
   if (!value) return "Not available";
   return String(value).replace(/[-_]/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
-}
-
-function getInitials(name = "") {
-  const parts = String(name).trim().split(/\s+/).filter(Boolean);
-  if (!parts.length) return "EP";
-  return parts.slice(0, 2).map((part) => part[0]?.toUpperCase()).join("");
 }
 
 function formatDate(value, includeTime = false) {
@@ -562,19 +556,16 @@ export default function ProfilePage() {
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
                 <div className="relative grid h-24 w-24 shrink-0 place-items-center rounded-2xl bg-[#EAF5FF] text-3xl font-semibold text-[#2E95F7] ring-8 ring-white">
                   {normalizedProfile?.profileImage ? (
-                    <Image
-                      src={normalizedProfile.profileImage}
-                      alt={normalizedProfile?.name || "Profile"}
-                      width={96}
-                      height={96}
-                      unoptimized
-                      className="h-full w-full rounded-2xl object-cover"
+                    <span
+                      className="h-full w-full rounded-2xl bg-cover bg-center"
+                      style={{ backgroundImage: `url(${normalizedProfile.profileImage})` }}
+                      aria-label={normalizedProfile?.name || "Profile"}
                     />
                   ) : (
-                    getInitials(normalizedProfile?.name)
+                    <UserRound size={38} />
                   )}
                   <span className="absolute -bottom-2 -right-2 grid h-9 w-9 place-items-center rounded-full bg-white text-[#A78BFA] shadow-[0_12px_30px_rgba(15,23,42,0.14)]">
-                    <ShieldCheck size={18} />
+                    <ImagePlus size={18} />
                   </span>
                 </div>
                 <div>
@@ -630,25 +621,17 @@ export default function ProfilePage() {
                     <TextInput label="Name" value={form.name} onChange={(value) => updateForm("name", value)} />
                     <TextInput label="Email" type="email" value={form.email} onChange={(value) => updateForm("email", value)} />
                     <TextInput label="Phone" value={form.phone} onChange={(value) => updateForm("phone", value)} />
-                    <TextInput
-                      label="Profile Image"
-                      value={form.profileImage}
-                      onChange={(value) => updateForm("profileImage", value)}
-                      placeholder="Image URL"
-                    />
                   </div>
 
-                  <div className="rounded-2xl border border-dashed border-[#CBD5E1] bg-[#F8FAFC] p-5">
-                    <div className="flex items-center gap-3">
-                      <div className="grid h-12 w-12 place-items-center rounded-2xl bg-white text-[#A78BFA]">
-                        <ImagePlus size={22} />
-                      </div>
-                      <div>
-                        <p className="text-sm font-semibold text-[#0F172A]">Profile image</p>
-                        <p className="mt-1 text-sm text-[#64748B]">Paste an image URL until file upload storage is connected.</p>
-                      </div>
-                    </div>
-                  </div>
+                  <ImageCropInput
+                    label="Profile image"
+                    value={form.profileImage}
+                    onChange={(value) => updateForm("profileImage", value)}
+                    aspect={1}
+                    outputWidth={512}
+                    optionalText="Optional"
+                    rounded="rounded-2xl"
+                  />
 
                   <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
                     <button

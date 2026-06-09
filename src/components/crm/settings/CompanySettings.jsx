@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { Building2, Edit3, ImageIcon, Save, X } from "lucide-react";
+import { Building2, Edit3, Save, X } from "lucide-react";
 import { generateSlug } from "@/lib/slug";
+import ImageCropInput from "@/components/common/ImageCropInput";
 
 const businessTypes = ["broker", "builder", "agency", "developer"];
 const fields = [
@@ -101,11 +102,28 @@ export default function CompanySettings({ tenant, loading, saving, onSave }) {
       </div>
 
       <div className="mt-6 grid gap-4 lg:grid-cols-[180px_minmax(0,1fr)]">
-        <div className="flex h-40 flex-col items-center justify-center rounded-2xl border border-dashed border-[#A78BFA] bg-[#F8FAFC] text-center">
-          <ImageIcon className="text-[#A78BFA]" size={28} />
-          <p className="mt-2 text-sm font-semibold text-[#0F172A]">Company logo</p>
-          <p className="text-xs text-[#64748B]">File upload coming soon</p>
-        </div>
+        {editing ? (
+          <ImageCropInput
+            label="Company logo"
+            value={form?.logo || ""}
+            onChange={(value) => updateField("logo", value)}
+            aspect={1}
+            outputWidth={512}
+            optionalText="Optional"
+          />
+        ) : (
+          <div className="flex h-40 flex-col items-center justify-center overflow-hidden rounded-2xl border border-dashed border-[#A78BFA] bg-[#F8FAFC] text-center">
+            {visibleData?.logo ? (
+              <span className="h-full w-full bg-cover bg-center" style={{ backgroundImage: `url(${visibleData.logo})` }} aria-label="Company logo" />
+            ) : (
+              <>
+                <Building2 className="text-[#A78BFA]" size={28} />
+                <p className="mt-2 text-sm font-semibold text-[#0F172A]">Company logo</p>
+                <p className="text-xs text-[#64748B]">No logo uploaded</p>
+              </>
+            )}
+          </div>
+        )}
         <div className="grid gap-4 sm:grid-cols-2">
           {fields.map(([field, label]) =>
             loading ? <Skeleton key={field} /> : <Field key={field} field={field} label={label} value={visibleData?.[field]} editing={editing} onChange={updateField} />
