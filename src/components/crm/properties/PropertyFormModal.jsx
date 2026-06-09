@@ -1,5 +1,7 @@
 "use client";
 
+/* eslint-disable @next/next/no-img-element */
+
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ImagePlus, Loader2, Trash2, X } from "lucide-react";
@@ -309,7 +311,13 @@ function PropertyImageInput({ images, onAdd, onRemove, processing }) {
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {images.map((image, index) => (
             <div key={image.id || `${image.previewUrl}-${index}`} className="group relative overflow-hidden rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC]">
-              <div className="h-32 bg-cover bg-center" style={{ backgroundImage: `url(${image.previewUrl || image.value})` }} />
+              <img
+                src={image.previewUrl || image.value}
+                alt="Property preview"
+                loading="lazy"
+                decoding="async"
+                className="h-32 w-full object-cover"
+              />
               <button
                 type="button"
                 onClick={() => onRemove(index)}

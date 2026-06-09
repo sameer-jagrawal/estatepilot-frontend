@@ -1,5 +1,7 @@
 "use client";
 
+/* eslint-disable @next/next/no-img-element */
+
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Building2, MapPin, Plus, Star, X } from "lucide-react";
@@ -313,10 +315,8 @@ function PropertyViewModal({ open, property, onClose, onEdit }) {
                     <p className="mt-2 text-sm font-semibold leading-6 text-[#0F172A]">{property?.description || "No description added"}</p>
                   </div>
 
-                  <div className="grid gap-3 md:grid-cols-2">
-                    <PillGroup title="Amenities" items={property?.amenities} empty="No amenities added" />
-                    <PillGroup title="Images" items={property?.images} empty="No image URLs added" />
-                  </div>
+                  <PillGroup title="Amenities" items={property?.amenities} empty="No amenities added" />
+                  <PropertyImageGallery images={property?.images} />
                 </div>
               ) : (
                 <div className="mt-5 max-h-[56vh] overflow-y-auto pr-1">
@@ -344,6 +344,33 @@ function PropertyViewModal({ open, property, onClose, onEdit }) {
         </motion.div>
       ) : null}
     </AnimatePresence>
+  );
+}
+
+function PropertyImageGallery({ images }) {
+  const list = Array.isArray(images) ? images.filter(Boolean) : [];
+
+  return (
+    <div className="rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] p-4">
+      <p className="text-xs font-semibold uppercase tracking-wide text-[#94A3B8]">Images</p>
+      {list.length ? (
+        <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {list.map((image, index) => (
+            <a key={`${image}-${index}`} href={image} target="_blank" rel="noreferrer" className="block overflow-hidden rounded-xl border border-[#E2E8F0] bg-white">
+              <img
+                src={image}
+                alt={`Property image ${index + 1}`}
+                loading="lazy"
+                decoding="async"
+                className="h-36 w-full object-cover transition duration-200 hover:scale-[1.02]"
+              />
+            </a>
+          ))}
+        </div>
+      ) : (
+        <p className="mt-2 text-sm text-[#64748B]">No images added</p>
+      )}
+    </div>
   );
 }
 

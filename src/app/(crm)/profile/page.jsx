@@ -1,5 +1,7 @@
 "use client";
 
+/* eslint-disable @next/next/no-img-element */
+
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -556,10 +558,12 @@ export default function ProfilePage() {
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
                 <div className="relative grid h-24 w-24 shrink-0 place-items-center rounded-full bg-[#EAF5FF] text-3xl font-semibold text-[#2E95F7] ring-8 ring-white">
                   {normalizedProfile?.profileImage ? (
-                    <span
-                      className="h-full w-full rounded-full bg-cover bg-center"
-                      style={{ backgroundImage: `url(${normalizedProfile.profileImage})` }}
-                      aria-label={normalizedProfile?.name || "Profile"}
+                    <img
+                      src={normalizedProfile.profileImage}
+                      alt={normalizedProfile?.name || "Profile"}
+                      loading="lazy"
+                      decoding="async"
+                      className="h-full w-full rounded-full object-cover"
                     />
                   ) : (
                     <UserRound size={38} />

@@ -1,5 +1,7 @@
 "use client";
 
+/* eslint-disable @next/next/no-img-element */
+
 import { useState } from "react";
 import { Building2, Edit3, Save, X } from "lucide-react";
 import { generateSlug } from "@/lib/slug";
@@ -114,7 +116,13 @@ export default function CompanySettings({ tenant, loading, saving, onSave }) {
         ) : (
           <div className="flex h-40 flex-col items-center justify-center overflow-hidden rounded-2xl border border-dashed border-[#A78BFA] bg-[#F8FAFC] text-center">
             {visibleData?.logo ? (
-              <span className="h-full w-full bg-cover bg-center" style={{ backgroundImage: `url(${visibleData.logo})` }} aria-label="Company logo" />
+              <img
+                src={visibleData.logo}
+                alt="Company logo"
+                loading="lazy"
+                decoding="async"
+                className="h-full w-full object-cover"
+              />
             ) : (
               <>
                 <Building2 className="text-[#A78BFA]" size={28} />

@@ -1,5 +1,7 @@
 "use client";
 
+/* eslint-disable @next/next/no-img-element */
+
 import { Building2, Edit3, Eye, MapPin, Trash2 } from "lucide-react";
 import PropertyStatusBadge, { formatPropertyLabel } from "./PropertyStatusBadge";
 
@@ -20,8 +22,20 @@ export function createdByName(property) {
 }
 
 export default function PropertyCard({ property, onView, onEdit, onDelete }) {
+  const thumbnail = Array.isArray(property?.images) ? property.images.find(Boolean) : "";
+
   return (
     <article className="rounded-2xl border border-[#E2E8F0] bg-white p-4 shadow-[0_16px_45px_rgba(15,23,42,0.04)] transition hover:-translate-y-0.5 hover:shadow-[0_22px_60px_rgba(15,23,42,0.08)]">
+      {thumbnail ? (
+        <img
+          src={thumbnail}
+          alt={property?.title ? `${property.title} property` : "Property"}
+          loading="lazy"
+          decoding="async"
+          className="mb-4 h-40 w-full rounded-xl object-cover"
+        />
+      ) : null}
+
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="text-xs font-semibold uppercase tracking-wide text-[#94A3B8]">{property?.propertyCode || "No code"}</p>
